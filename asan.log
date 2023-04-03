@@ -1,0 +1,71 @@
+[2021/11/10 00:52:06] tivo_commands.c:672: debug: Processing TiVo command Command=QueryContainer&Container=foobar&SortOrder=Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Typ
+[2021/11/10 00:52:06] tivo_commands.c:686: debug: Command: QueryContainer
+[2021/11/10 00:52:06] tivo_commands.c:686: debug: Container: foobar
+[2021/11/10 00:52:06] tivo_commands.c:686: debug: SortOrder: Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Type,Typ
+=================================================================
+==15972==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fff4d79cab0 at pc 0x7f3e38c2f77a bp 0x7fff4d79c710 sp 0x7fff4d79beb8
+WRITE of size 5 at 0x7fff4d79cab0 thread T0
+    #0 0x7f3e38c2f779  (/usr/lib/x86_64-linux-gnu/libasan.so.4+0x79779)
+    #1 0x564620ef74c6 in SendContainer /router/minidlna-1.3.0/tivo_commands.c:488
+    #2 0x564620ef8e9d in ProcessTiVoCommand /router/minidlna-1.3.0/tivo_commands.c:763
+    #3 0x564620ead435 in ProcessHttpQuery_upnphttp /router/minidlna-1.3.0/upnphttp.c:1001
+    #4 0x564620eadf4e in Process_upnphttp /router/minidlna-1.3.0/upnphttp.c:1114
+    #5 0x564620f1e99e in select_process /router/minidlna-1.3.0/select.c:182
+    #6 0x564620ea55f5 in main /router/minidlna-1.3.0/minidlna.c:1285
+    #7 0x7f3e36e64bf6 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x21bf6)
+    #8 0x564620e9d589 in _start (/router/minidlna-1.3.0/minidlnad+0x38589)
+
+Address 0x7fff4d79cab0 is located in stack of thread T0 at offset 800 in frame
+    #0 0x564620ef6673 in SendContainer /router/minidlna-1.3.0/tivo_commands.c:327
+
+  This frame has 14 object(s):
+    [32, 36) 'ret'
+    [96, 104) 'saveptr'
+    [160, 168) 'zErrMsg'
+    [224, 232) 'result'
+    [288, 296) 'title'
+    [352, 376) 'str'
+    [416, 456) 'args'
+    [512, 520) 'type'
+    [576, 586) 'what'
+    [640, 659) 'groupBy'
+    [704, 800) 'order' <== Memory access at offset 800 overflows this variable
+    [832, 928) 'order2'
+    [960, 1216) 'myfilter'
+    [1248, 2272) 'str_buf'
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow (/usr/lib/x86_64-linux-gnu/libasan.so.4+0x79779) 
+Shadow bytes around the buggy address:
+  0x100069aeb900: f2 f2 f2 f2 f2 f2 00 f2 f2 f2 f2 f2 f2 f2 00 f2
+  0x100069aeb910: f2 f2 f2 f2 f2 f2 00 f2 f2 f2 f2 f2 f2 f2 00 00
+  0x100069aeb920: 00 f2 f2 f2 f2 f2 00 00 00 00 00 f2 f2 f2 f2 f2
+  0x100069aeb930: f2 f2 00 f2 f2 f2 f2 f2 f2 f2 00 02 f2 f2 f2 f2
+  0x100069aeb940: f2 f2 00 00 03 f2 f2 f2 f2 f2 00 00 00 00 00 00
+=>0x100069aeb950: 00 00 00 00 00 00[f2]f2 f2 f2 00 00 00 00 00 00
+  0x100069aeb960: 00 00 00 00 00 00 f2 f2 f2 f2 00 00 00 00 00 00
+  0x100069aeb970: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100069aeb980: 00 00 00 00 00 00 00 00 00 00 f2 f2 f2 f2 00 00
+  0x100069aeb990: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x100069aeb9a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==15972==ABORTING
+
